@@ -4,7 +4,6 @@ import {
   fetchSummary,
   fetchAvailableConferences,
   syncConference,
-  updateRepo,
   fetchSyncStatus,
 } from "@/utils/api";
 import { ElMessage, ElMessageBox } from "element-plus";
@@ -29,7 +28,6 @@ const downloadProgress = ref("");
 
 // Sync status
 const syncStatus = ref(null);
-const updatingRepo = ref(false);
 
 // Get years for selected conference
 const availableYears = computed(() => {
@@ -87,7 +85,7 @@ async function loadAvailableConferences() {
   }
 }
 
-// Download/sync selected conference
+// Download/sync selected conference (no git clone needed!)
 async function downloadConference() {
   if (!selectedDownloadConf.value || !selectedDownloadYear.value) {
     ElMessage.warning("Please select a conference and year");
@@ -95,14 +93,10 @@ async function downloadConference() {
   }
 
   downloading.value = true;
-  downloadProgress.value = "Updating repository...";
+  downloadProgress.value = `Syncing ${selectedDownloadConf.value} ${selectedDownloadYear.value}...`;
 
   try {
-    // First update repo
-    await updateRepo();
-    downloadProgress.value = `Syncing ${selectedDownloadConf.value} ${selectedDownloadYear.value}...`;
-
-    // Then sync the conference
+    // Sync - downloads file and computes diffs via GitHub API (no git clone!)
     const result = await syncConference(
       selectedDownloadConf.value,
       selectedDownloadYear.value,
@@ -110,7 +104,7 @@ async function downloadConference() {
 
     if (result.success) {
       ElMessage.success(
-        `Downloaded ${selectedDownloadConf.value} ${selectedDownloadYear.value}`,
+        `Synced ${selectedDownloadConf.value} ${selectedDownloadYear.value}`,
       );
       downloadProgress.value = "Done!";
 
@@ -126,12 +120,12 @@ async function downloadConference() {
         selectedDownloadYear.value,
       );
     } else {
-      ElMessage.error(result.error || "Download failed");
+      ElMessage.error(result.error || "Sync failed");
       downloadProgress.value = "";
     }
   } catch (err) {
-    console.error("Download error:", err);
-    ElMessage.error("Failed to download conference data");
+    console.error("Sync error:", err);
+    ElMessage.error("Failed to sync conference data");
     downloadProgress.value = "";
   } finally {
     downloading.value = false;
@@ -193,30 +187,11 @@ async function loadSyncStatus() {
   }
 }
 
-// Update repository only
-async function handleUpdateRepo() {
-  updatingRepo.value = true;
-  try {
-    const result = await updateRepo();
-    if (result.success) {
-      ElMessage.success("Repository updated successfully");
-      await loadSyncStatus();
-    } else {
-      ElMessage.error(result.error || "Failed to update repository");
-    }
-  } catch (err) {
-    console.error("Update repo error:", err);
-    ElMessage.error("Failed to update repository");
-  } finally {
-    updatingRepo.value = false;
-  }
-}
-
-// Re-sync a specific conference (update diffs)
+// Re-sync a specific conference (no git clone needed!)
 async function resyncConference(conf, year) {
   try {
     await ElMessageBox.confirm(
-      `Re-sync ${conf.toUpperCase()} ${year}? This will update the data and recompute rating diffs.`,
+      `Re-sync ${conf.toUpperCase()} ${year}? This will update data and recompute rating diffs.`,
       "Confirm Re-sync",
       {
         confirmButtonText: "Re-sync",
@@ -232,7 +207,6 @@ async function resyncConference(conf, year) {
   downloadProgress.value = `Re-syncing ${conf} ${year}...`;
 
   try {
-    await updateRepo();
     const result = await syncConference(conf, year);
 
     if (result.success) {
@@ -262,7 +236,7 @@ async function resyncConference(conf, year) {
   }
 }
 
-// Sync all downloaded conferences
+// Sync all downloaded conferences (no git clone needed!)
 async function syncAllConferences() {
   if (downloadedConferences.value.length === 0) {
     ElMessage.warning("No conferences to sync");
@@ -286,9 +260,6 @@ async function syncAllConferences() {
   downloading.value = true;
 
   try {
-    downloadProgress.value = "Updating repository...";
-    await updateRepo();
-
     for (let i = 0; i < downloadedConferences.value.length; i++) {
       const { conference, year } = downloadedConferences.value[i];
       downloadProgress.value = `Syncing ${conference} ${year} (${i + 1}/${downloadedConferences.value.length})...`;
@@ -414,14 +385,6 @@ onMounted(() => {
         <div class="sync-actions">
           <el-button
             size="small"
-            @click="handleUpdateRepo"
-            :loading="updatingRepo"
-          >
-            <span class="i-carbon-update-now mr-1" v-if="!updatingRepo"></span>
-            Update Repo
-          </el-button>
-          <el-button
-            size="small"
             type="primary"
             @click="syncAllConferences"
             :loading="downloading"
@@ -436,20 +399,6 @@ onMounted(() => {
         <span class="status-item">
           <span class="i-carbon-folder mr-1"></span>
           {{ syncStatus.local_count }} local files
-        </span>
-        <span
-          class="status-item"
-          :class="{
-            'status-ok': syncStatus.repo_exists,
-            'status-warn': !syncStatus.repo_exists,
-          }"
-        >
-          <span
-            class="i-carbon-checkmark-filled mr-1"
-            v-if="syncStatus.repo_exists"
-          ></span>
-          <span class="i-carbon-warning mr-1" v-else></span>
-          {{ syncStatus.repo_exists ? "Repo cloned" : "Repo not cloned" }}
         </span>
       </div>
 
@@ -659,6 +608,10 @@ onMounted(() => {
 
 .status-item.status-warn {
   color: var(--el-color-warning);
+}
+
+.status-item.status-error {
+  color: var(--el-color-danger);
 }
 
 .downloaded-list {

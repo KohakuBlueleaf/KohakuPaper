@@ -182,6 +182,7 @@ export async function updateRepo() {
 
 /**
  * Sync a specific conference (download and compute diffs)
+ * NO git clone required - uses GitHub API for everything!
  * @param {string} conference
  * @param {number} year
  * @returns {Promise<{success: boolean, message: string}>}

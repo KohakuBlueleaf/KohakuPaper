@@ -106,12 +106,15 @@ async def sync_conference(
     conference: str = Query(..., description="Conference name (e.g., iclr, nips)"),
     year: int = Query(..., description="Conference year (e.g., 2026)"),
 ):
-    """Sync a specific conference - downloads data and computes diffs"""
+    """
+    Sync a specific conference - downloads data and computes diffs.
+    NO git clone required - uses GitHub API for everything!
+    """
     try:
         output_path = sync_conference_data(conference, year)
         return {
             "success": True,
-            "message": f"Synced {conference}{year}",
+            "message": f"Synced {conference}{year} with diffs",
             "output_file": str(output_path),
         }
     except FileNotFoundError as e:
@@ -122,9 +125,10 @@ async def sync_conference(
 
 @router.get("/status")
 async def get_sync_status():
-    """Check if repo is cloned and get basic info"""
+    """Check sync status"""
     repo_path = get_repo_path()
     local = get_local_conferences()
+
     return {
         "repo_exists": repo_path.exists(),
         "repo_path": str(repo_path),

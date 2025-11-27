@@ -81,16 +81,17 @@ def main():
 def run_server(host: str, port: int, reload: bool):
     """Start the API server"""
     import uvicorn
-    from .config import PROJECT_ROOT
 
-    # Configure reload to exclude data directories
-    reload_excludes = []
+    # Configure reload to exclude data directories (use relative glob patterns)
+    reload_excludes = None
     if reload:
-        # Exclude paperlists and data directories from file watching
+        # Exclude paperlists, data, and cache directories from file watching
+        # Use glob patterns relative to the working directory
         reload_excludes = [
-            str(PROJECT_ROOT / "paperlists"),
-            str(PROJECT_ROOT / "data"),
-            str(PROJECT_ROOT / ".cache"),
+            "paperlists/*",
+            "data/*",
+            ".cache/*",
+            ".venv/*",
         ]
 
     uvicorn.run(
@@ -98,7 +99,7 @@ def run_server(host: str, port: int, reload: bool):
         host=host,
         port=port,
         reload=reload,
-        reload_excludes=reload_excludes if reload else None,
+        reload_excludes=reload_excludes,
     )
 
 
