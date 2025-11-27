@@ -269,7 +269,9 @@ def compute_paper_diffs(
         diff_info = {
             # Only set if we have actual scores (not empty arrays)
             "rating_current": current_rating_scores if current_rating_scores else None,
-            "confidence_current": current_confidence_scores if current_confidence_scores else None,
+            "confidence_current": (
+                current_confidence_scores if current_confidence_scores else None
+            ),
             "rating_first": None,
             "confidence_first": None,
             "rating_diff": None,
@@ -297,7 +299,8 @@ def compute_paper_diffs(
                 and len(first_rating_scores_raw) > 0
             ):
                 rating_diff_raw = [
-                    c - f for c, f in zip(current_rating_scores_raw, first_rating_scores_raw)
+                    c - f
+                    for c, f in zip(current_rating_scores_raw, first_rating_scores_raw)
                 ]
                 # Always set rating_first when lengths match (for Init column)
                 diff_info["rating_first"] = first_rating_scores
@@ -318,14 +321,18 @@ def compute_paper_diffs(
             ):
                 confidence_diff_raw = [
                     c - f
-                    for c, f in zip(current_confidence_scores_raw, first_confidence_scores_raw)
+                    for c, f in zip(
+                        current_confidence_scores_raw, first_confidence_scores_raw
+                    )
                 ]
                 # Always set confidence_first when lengths match
                 diff_info["confidence_first"] = first_confidence_scores
 
                 if any(d != 0 for d in confidence_diff_raw):
                     # Sort the diffs to match the sorted display order
-                    paired = list(zip(current_confidence_scores_raw, confidence_diff_raw))
+                    paired = list(
+                        zip(current_confidence_scores_raw, confidence_diff_raw)
+                    )
                     paired.sort(key=lambda x: -x[0])
                     confidence_diff = [d for _, d in paired]
                     diff_info["confidence_diff"] = confidence_diff

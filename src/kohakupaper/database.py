@@ -168,35 +168,53 @@ def query_papers(
 
     if has_confidence_diff is True:
         # Check if _diff.confidence_diff has non-zero values
-        conditions.append("(_diff IS NOT NULL AND _diff.confidence_diff IS NOT NULL AND list_reduce(_diff.confidence_diff, (a, b) -> a + abs(b), 0) > 0)")
+        conditions.append(
+            "(_diff IS NOT NULL AND _diff.confidence_diff IS NOT NULL AND list_reduce(_diff.confidence_diff, (a, b) -> a + abs(b), 0) > 0)"
+        )
 
     # Filter by initial rating average (computed from _diff.rating_first)
     if min_rating_init is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first) >= {min_rating_init})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first) >= {min_rating_init})"
+        )
 
     if max_rating_init is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first) <= {max_rating_init})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first) <= {max_rating_init})"
+        )
 
     # Filter by rating diff (current avg - init avg)
     if min_rating_diff is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND _diff.rating_current IS NOT NULL AND (list_reduce(_diff.rating_current, (a, b) -> a + b, 0) / len(_diff.rating_current) - list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first)) >= {min_rating_diff})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND _diff.rating_current IS NOT NULL AND (list_reduce(_diff.rating_current, (a, b) -> a + b, 0) / len(_diff.rating_current) - list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first)) >= {min_rating_diff})"
+        )
 
     if max_rating_diff is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND _diff.rating_current IS NOT NULL AND (list_reduce(_diff.rating_current, (a, b) -> a + b, 0) / len(_diff.rating_current) - list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first)) <= {max_rating_diff})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND _diff.rating_current IS NOT NULL AND (list_reduce(_diff.rating_current, (a, b) -> a + b, 0) / len(_diff.rating_current) - list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first)) <= {max_rating_diff})"
+        )
 
     # Filter by initial confidence average
     if min_confidence_init is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first) >= {min_confidence_init})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first) >= {min_confidence_init})"
+        )
 
     if max_confidence_init is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first) <= {max_confidence_init})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first) <= {max_confidence_init})"
+        )
 
     # Filter by confidence diff (current avg - init avg)
     if min_confidence_diff is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND _diff.confidence_current IS NOT NULL AND (list_reduce(_diff.confidence_current, (a, b) -> a + b, 0) / len(_diff.confidence_current) - list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first)) >= {min_confidence_diff})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND _diff.confidence_current IS NOT NULL AND (list_reduce(_diff.confidence_current, (a, b) -> a + b, 0) / len(_diff.confidence_current) - list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first)) >= {min_confidence_diff})"
+        )
 
     if max_confidence_diff is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND _diff.confidence_current IS NOT NULL AND (list_reduce(_diff.confidence_current, (a, b) -> a + b, 0) / len(_diff.confidence_current) - list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first)) <= {max_confidence_diff})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND _diff.confidence_current IS NOT NULL AND (list_reduce(_diff.confidence_current, (a, b) -> a + b, 0) / len(_diff.confidence_current) - list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first)) <= {max_confidence_diff})"
+        )
 
     if title_filter:
         title_escaped = title_filter.replace("'", "''")
@@ -328,35 +346,53 @@ def count_papers(
         conditions.append("(_diff IS NOT NULL AND _diff.has_diff = true)")
 
     if has_confidence_diff is True:
-        conditions.append("(_diff IS NOT NULL AND _diff.confidence_diff IS NOT NULL AND list_reduce(_diff.confidence_diff, (a, b) -> a + abs(b), 0) > 0)")
+        conditions.append(
+            "(_diff IS NOT NULL AND _diff.confidence_diff IS NOT NULL AND list_reduce(_diff.confidence_diff, (a, b) -> a + abs(b), 0) > 0)"
+        )
 
     # Filter by initial rating average
     if min_rating_init is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first) >= {min_rating_init})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first) >= {min_rating_init})"
+        )
 
     if max_rating_init is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first) <= {max_rating_init})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first) <= {max_rating_init})"
+        )
 
     # Filter by rating diff
     if min_rating_diff is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND _diff.rating_current IS NOT NULL AND (list_reduce(_diff.rating_current, (a, b) -> a + b, 0) / len(_diff.rating_current) - list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first)) >= {min_rating_diff})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND _diff.rating_current IS NOT NULL AND (list_reduce(_diff.rating_current, (a, b) -> a + b, 0) / len(_diff.rating_current) - list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first)) >= {min_rating_diff})"
+        )
 
     if max_rating_diff is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND _diff.rating_current IS NOT NULL AND (list_reduce(_diff.rating_current, (a, b) -> a + b, 0) / len(_diff.rating_current) - list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first)) <= {max_rating_diff})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.rating_first IS NOT NULL AND _diff.rating_current IS NOT NULL AND (list_reduce(_diff.rating_current, (a, b) -> a + b, 0) / len(_diff.rating_current) - list_reduce(_diff.rating_first, (a, b) -> a + b, 0) / len(_diff.rating_first)) <= {max_rating_diff})"
+        )
 
     # Filter by initial confidence average
     if min_confidence_init is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first) >= {min_confidence_init})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first) >= {min_confidence_init})"
+        )
 
     if max_confidence_init is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first) <= {max_confidence_init})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first) <= {max_confidence_init})"
+        )
 
     # Filter by confidence diff
     if min_confidence_diff is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND _diff.confidence_current IS NOT NULL AND (list_reduce(_diff.confidence_current, (a, b) -> a + b, 0) / len(_diff.confidence_current) - list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first)) >= {min_confidence_diff})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND _diff.confidence_current IS NOT NULL AND (list_reduce(_diff.confidence_current, (a, b) -> a + b, 0) / len(_diff.confidence_current) - list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first)) >= {min_confidence_diff})"
+        )
 
     if max_confidence_diff is not None:
-        conditions.append(f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND _diff.confidence_current IS NOT NULL AND (list_reduce(_diff.confidence_current, (a, b) -> a + b, 0) / len(_diff.confidence_current) - list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first)) <= {max_confidence_diff})")
+        conditions.append(
+            f"(_diff IS NOT NULL AND _diff.confidence_first IS NOT NULL AND _diff.confidence_current IS NOT NULL AND (list_reduce(_diff.confidence_current, (a, b) -> a + b, 0) / len(_diff.confidence_current) - list_reduce(_diff.confidence_first, (a, b) -> a + b, 0) / len(_diff.confidence_first)) <= {max_confidence_diff})"
+        )
 
     if title_filter:
         title_escaped = title_filter.replace("'", "''")

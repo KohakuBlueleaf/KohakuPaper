@@ -40,14 +40,30 @@ async def list_papers(
     ),
     title_filter: str | None = Query(None, description="Filter by title substring"),
     # New filters for init and diff columns
-    min_rating_init: float | None = Query(None, description="Minimum initial rating average"),
-    max_rating_init: float | None = Query(None, description="Maximum initial rating average"),
-    min_rating_diff: float | None = Query(None, description="Minimum rating diff (current - init)"),
-    max_rating_diff: float | None = Query(None, description="Maximum rating diff (current - init)"),
-    min_confidence_init: float | None = Query(None, description="Minimum initial confidence average"),
-    max_confidence_init: float | None = Query(None, description="Maximum initial confidence average"),
-    min_confidence_diff: float | None = Query(None, description="Minimum confidence diff (current - init)"),
-    max_confidence_diff: float | None = Query(None, description="Maximum confidence diff (current - init)"),
+    min_rating_init: float | None = Query(
+        None, description="Minimum initial rating average"
+    ),
+    max_rating_init: float | None = Query(
+        None, description="Maximum initial rating average"
+    ),
+    min_rating_diff: float | None = Query(
+        None, description="Minimum rating diff (current - init)"
+    ),
+    max_rating_diff: float | None = Query(
+        None, description="Maximum rating diff (current - init)"
+    ),
+    min_confidence_init: float | None = Query(
+        None, description="Minimum initial confidence average"
+    ),
+    max_confidence_init: float | None = Query(
+        None, description="Maximum initial confidence average"
+    ),
+    min_confidence_diff: float | None = Query(
+        None, description="Minimum confidence diff (current - init)"
+    ),
+    max_confidence_diff: float | None = Query(
+        None, description="Maximum confidence diff (current - init)"
+    ),
     limit: int = Query(50, ge=1, le=500, description="Results per page"),
     offset: int = Query(0, ge=0, description="Pagination offset"),
     order_by: str = Query("rating_avg", description="Sort field"),
