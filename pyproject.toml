@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kohakupaper"
+version = "0.4.0"
+description = "KohakuPaper - Local version of Paper Copilot"
+readme = "README.md"
+requires-python = ">=3.10"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Shih-Ying Yeh(KohakuBlueLeaf)", email = "apolloyeh0123@gmail.com"},
+]
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "duckdb>=1.1.0",
+    "pandas>=2.0.0",
+    "httpx>=0.28.0",
+]
+
+[project.scripts]
+kohakupaper = "kohakupaper.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+kohakupaper = ["*.toml"]
